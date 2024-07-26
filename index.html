@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List with Notes</title>
+    <style>
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            transition: background-color 0.3s ease;
+            overflow: hidden;
+        }
+
+        .theme-dark body {
+            background: linear-gradient(135deg, #333333, #555555);
+            color: #ffffff;
+        }
+
+        .todo-container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            transition: background-color 0.3s ease;
+            z-index: 1;
+        }
+
+        .theme-dark .todo-container {
+            background-color: #444444;
+            color: #ffffff;
+        }
+
+        .todo-container h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .theme-dark .todo-container h1 {
+            color: #ffffff;
+        }
+
+        .todo-input {
+            width: calc(100% - 24px);
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 17px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .theme-dark .todo-input {
+            background-color: #666666;
+            color: #ffffff;
+            border: 1px solid #444444;
+        }
+
+        .todo-button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background-color: #007aff;
+            color: #ffffff;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .todo-button:hover {
+            background-color: #005bb5;
+        }
+
+        .todo-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .todo-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background-color: #fafafa;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .theme-dark .todo-item {
+            background-color: #666666;
+            border: 1px solid #444444;
+        }
+
+        .todo-item.done {
+            background-color: #d1e7dd;
+        }
+
+        .theme-dark .todo-item.done {
+            background-color: #555555;
+        }
+
+        .todo-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .todo-actions button {
+            margin-left: 5px;
+            padding: 5px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: #007aff;
+            transition: color 0.3s ease;
+        }
+
+        .todo-actions button:hover {
+            color: #005bb5;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            padding: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            z-index: 2;
+        }
+
+        .theme-dark .theme-toggle {
+            background-color: #444444;
+            color: #ffffff;
+        }
+
+        .done-checkbox {
+            margin-right: 10px;
+        }
+
+        .waves {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            top: 0;
+            left: 0;
+            background: url('https://www.transparenttextures.com/patterns/gray-wash-wall.png');
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 3;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .theme-dark .modal-content {
+            background-color: #444444;
+            color: #ffffff;
+        }
+
+        .close {
+            color: #aaa;
+            position: absolute;
+            right: 20px;
+            top: 10px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-input {
+            width: calc(100% - 24px);
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 17px;
+        }
+    </style>
+</head>
+<body>
+    <div class="waves"></div>
+    <div class="todo-container">
+        <h1>To-Do List</h1>
+        <input type="text" class="todo-input" placeholder="Add a new task" aria-label="New task">
+        <button class="todo-button">Add Task</button>
+        <ul class="todo-list"></ul>
+    </div>
+    <button class="theme-toggle"><i class="fas fa-moon"></i></button>
+
+    <!-- The Modal -->
+    <div id="noteModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Edit Note</h2>
+            <textarea class="modal-input" rows="5"></textarea>
+            <button class="todo-button save-note-button">Save Note</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const todoInput = document.querySelector('.todo-input');
+            const todoButton = document.querySelector('.todo-button');
+            const todoList = document.querySelector('.todo-list');
+            const themeToggle = document.querySelector('.theme-toggle');
+            const body = document.body;
+            const noteModal = document.getElementById('noteModal');
+            const closeModal = document.querySelector('.close');
+            const saveNoteButton = document.querySelector('.save-note-button');
+            const modalInput = document.querySelector('.modal-input');
+            let currentTodoItem = null;
+
+            themeToggle.addEventListener('click', () => {
+                body.classList.toggle('theme-dark');
+                themeToggle.innerHTML = body.classList.contains('theme-dark')
+                    ? '<i class="fas fa-sun"></i>'
+                    : '<i class="fas fa-moon"></i>';
+            });
+
+            todoButton.addEventListener('click', addTodo);
+
+            function addTodo() {
+                const task = todoInput.value.trim();
+                if (!task) return;
+
+                const todoItem = document.createElement('li');
+                todoItem.className = 'todo-item';
+
+                const doneCheckbox = document.createElement('input');
+                doneCheckbox.type = 'checkbox';
+                doneCheckbox.className = 'done-checkbox';
+                doneCheckbox.addEventListener('change', () => {
+                    todoItem.classList.toggle('done');
+                });
+
+                const todoText = document.createElement('span');
+                todoText.textContent = task;
+
+                const todoActions = document.createElement('div');
+                todoActions.className = 'todo-actions';
+
+                const noteButton = document.createElement('button');
+                noteButton.innerHTML = '<i class="fas fa-sticky-note"></i>';
+                noteButton.addEventListener('click', () => {
+                    currentTodoItem = todoItem;
+                    modalInput.value = todoItem.dataset.note || '';
+                    noteModal.style.display = 'flex';
+                });
+
+                const deleteButton = document.createElement('button');
+                deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
+                deleteButton.addEventListener('click', () => {
+                    todoItem.remove();
+                });
+
+                todoActions.appendChild(noteButton);
+                todoActions.appendChild(deleteButton);
+
+                todoItem.appendChild(doneCheckbox);
+                todoItem.appendChild(todoText);
+                todoItem.appendChild(todoActions);
+
+                todoList.appendChild(todoItem);
+                todoInput.value = '';
+            }
+
+            closeModal.addEventListener('click', () => {
+                noteModal.style.display = 'none';
+            });
+
+            saveNoteButton.addEventListener('click', () => {
+                if (currentTodoItem) {
+                    currentTodoItem.dataset.note = modalInput.value;
+                    noteModal.style.display = 'none';
+                }
+            });
+
+            window.addEventListener('click', (event) => {
+                if (event.target === noteModal) {
+                    noteModal.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
