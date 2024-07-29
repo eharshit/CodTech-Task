@@ -37,4 +37,4 @@ Click the trash icon next to a task to delete it from the list.
 Click the moon/sun icon in the top right corner to toggle between light and dark themes.
 
 ## Output Image
-https://github.com/user-attachments/assets/953ff627-1c4a-4789-b6d9-15ab524e485d
+![To-do List Output](https://github.com/user-attachments/assets/953ff627-1c4a-4789-b6d9-15ab524e485d)
